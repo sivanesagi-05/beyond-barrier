@@ -1,13 +1,24 @@
+import json
 from docx import Document
+from docx.shared import Pt
 
-def generate_resume(data):
+def generate_resume(json_file="user_data.json", output_file="generated_resume.docx"):
+    # Load user data
+    with open(json_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    # Create a Word document
     doc = Document()
-    doc.add_heading("Resume", 0)
+    doc.add_heading("Resume", level=0)
 
-    doc.add_paragraph(f"Name: {data.get('name', '')}")
-    doc.add_paragraph(f"Qualification: {data.get('qualification', '')}")
-    doc.add_paragraph(f"Skills: {data.get('skills', '')}")
-    doc.add_paragraph(f"Experience: {data.get('experience', '')}")
-    doc.add_paragraph(f"Contact: {data.get('contact', '')}")
+    for key, value in data.items():
+        doc.add_heading(key, level=1)
+        doc.add_paragraph(value)
 
-    doc.save("generated_resume.docx")
+    # Optional: set font size
+    for para in doc.paragraphs:
+        for run in para.runs:
+            run.font.size = Pt(12)
+
+    doc.save(output_file)
+    print(f"💼 Resume generated successfully: {output_file}")
